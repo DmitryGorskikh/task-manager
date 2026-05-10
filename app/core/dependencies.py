@@ -3,6 +3,8 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.cache import CacheService
+from app.core.redis import get_redis
 from app.core.security import decode_token
 from app.db.base import AsyncSessionLocal
 from app.db.models.user import User
@@ -14,6 +16,11 @@ bearer_scheme = HTTPBearer()
 async def get_db() -> AsyncSession:
     async with AsyncSessionLocal() as session:
         yield session
+
+
+async def get_cache() -> CacheService:
+    redis = await get_redis()
+    return CacheService(redis)
 
 
 async def get_current_user(
